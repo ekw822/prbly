@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>면접 안내 메일 생성기 | 인사팀 전용</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--primary-color);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            color: #666;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #1a252f;
+        }
+
+        #result-section {
+            margin-top: 40px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .result-header h2 {
+            font-size: 18px;
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .copy-btn {
+            background-color: #eee;
+            color: #333;
+            padding: 6px 12px;
+            font-size: 13px;
+            width: auto;
+            margin: 0;
+        }
+
+        .copy-btn:hover {
+            background-color: #ddd;
+        }
+
+        #email-content {
+            width: 100%;
+            height: 400px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: #fafafa;
+            font-family: inherit;
+            font-size: 15px;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            color: #444;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>면접 안내 메일 생성기</h1>
+        <p>지원자 정보를 입력하여 정중한 안내 메일을 생성합니다.</p>
+    </header>
+
+    <div class="form-container">
+        <div class="form-group">
+            <label for="candidateName">지원자 이름</label>
+            <input type="text" id="candidateName" placeholder="예: 홍길동">
+        </div>
+
+        <div class="grid">
+            <div class="form-group">
+                <label for="interviewDate">면접 날짜</label>
+                <input type="date" id="interviewDate">
+            </div>
+            <div class="form-group">
+                <label for="interviewTime">면접 시간</label>
+                <input type="time" id="interviewTime">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="jobPosition">지원 직무</label>
+            <input type="text" id="jobPosition" placeholder="예: 백엔드 개발자">
+        </div>
+
+        <button onclick="generateEmail()">메일 생성하기</button>
+    </div>
+
+    <div id="result-section">
+        <div class="result-header">
+            <h2>생성된 메일 내용</h2>
+            <button class="copy-btn" onclick="copyToClipboard()">텍스트 복사</button>
+        </div>
+        <div id="email-content"></div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 HR Operations Support System
+    </div>
+</div>
+
+<script>
+    function generateEmail() {
+        const name = document.getElementById('candidateName').value;
+        const date = document.getElementById('interviewDate').value;
+        const time = document.getElementById('interviewTime').value;
+        const position = document.getElementById('jobPosition').value;
+
+        if (!name || !date || !time || !position) {
+            alert('모든 항목을 입력해주세요.');
+            return;
+        }
+
+        // 날짜 포맷팅 (YYYY-MM-DD -> YYYY년 MM월 DD일)
+        const dateObj = new Date(date);
+        const formattedDate = `${dateObj.getFullYear()}년 ${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일`;
+
+        const template = `안녕하세요, ${name}님.
+
+[회사명] 인사팀입니다.
+
+먼저 저희 [회사명]의 ${position} 포지션에 관심을 가져주시고 지원해 주셔서 진심으로 감사드립니다.
+
+보내주신 이력서와 포트폴리오를 긍정적으로 검토하였으며, 실무진 면접을 통해 ${name}님과 더 깊이 있는 대화를 나누고자 아래와 같이 면접 일정을 제안드립니다.
+
+[면접 일정 안내]
+
+• 일시: ${formattedDate} / ${time}
+• 장소: [장소 입력: 예) 본사 3층 대회의실 또는 화상 면접 링크]
+• 소요 시간: 약 1시간 내외
+
+본 면접 일정에 참석 가능하신지 확인 부탁드립니다. 
+만약 해당 일시에 참석이 어려우시다면, 가능한 다른 일정(2~3개)을 회신 주시면 조율하도록 하겠습니다.
+
+면접과 관련하여 추가적인 문의 사항이 있으시면 언제든지 편하게 문의해 주시기 바랍니다.
+
+감사합니다.
+
+[회사명] 인사팀 드림`;
+
+        const resultSection = document.getElementById('result-section');
+        const emailContent = document.getElementById('email-content');
+
+        emailContent.innerText = template;
+        resultSection.style.display = 'block';
+        
+        // 결과창으로 스크롤 이동
+        resultSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyToClipboard() {
+        const content = document.getElementById('email-content').innerText;
+        navigator.clipboard.writeText(content).then(() => {
+            alert('메일 내용이 클립보드에 복사되었습니다.');
+        }).catch(err => {
+            console.error('복사 실패:', err);
+        });
+    }
+</script>
+
+</body>
+</html>
